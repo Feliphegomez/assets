@@ -174,6 +174,8 @@ func retrieveUniswapPairs(url string, query map[string]string, minLiquidity, min
 		}
 	}
 
+	log.Debugf("Retrieved & filtered: %d", len(filtered))
+
 	return filtered, nil
 }
 
@@ -419,7 +421,9 @@ func rebuildTokenList(chain coin.Coin, pairs [][]TokenItem, forceExcludeList []s
 		return nil
 	}
 
-	removeAllPairs(&list)
+	log.Debugf("Tokenlist original: %d tokens", len(list.Tokens))
+
+	removeAllPairs(list.Tokens)
 
 	for _, pair := range pairs2 {
 		err = addPairIfNeeded(&pair[0], &pair[1], &list)
@@ -430,16 +434,7 @@ func rebuildTokenList(chain coin.Coin, pairs [][]TokenItem, forceExcludeList []s
 
 	log.Debugf("Tokenlist updated: %d tokens", len(list.Tokens))
 
-	var totalPairs int
-
-	for _, item := range list.Tokens {
-		totalPairs += len(item.Pairs)
-	}
-
-	log.Debugf("Tokenlist: list with %d tokens and %d pairs written to %s.",
-		len(list.Tokens), totalPairs, tokenListPath)
-
-	return fileLib.CreateJSONFile(tokenListPath, list)
+	return createTokenListJSON(chain, list.Tokens)
 }
 
 func checkTokenExists(chain, tokenID string) bool {
@@ -448,9 +443,9 @@ func checkTokenExists(chain, tokenID string) bool {
 	return fileLib.FileExists(logoPath)
 }
 
-func removeAllPairs(list *TokenList) {
-	for _, token := range list.Tokens {
-		token.Pairs = make([]Pair, 0)
+func removeAllPairs(tokens []TokenItem) {
+	for i := range tokens {
+		tokens[i].Pairs = make([]Pair, 0)
 	}
 }
 
@@ -495,14 +490,17 @@ func updateTokenInfo(token *TokenItem) error {
 	}
 
 	if token.Name != assetInfo.Name {
+		log.Debugf("Token name adjusted: '%s' -> '%s'", token.Name, assetInfo.Name)
 		token.Name = assetInfo.Name
 	}
 
 	if token.Symbol != assetInfo.Symbol {
+		log.Debugf("Token symbol adjusted: '%s' -> '%s'", token.Symbol, assetInfo.Symbol)
 		token.Symbol = assetInfo.Symbol
 	}
 
 	if token.Decimals != uint(assetInfo.Decimals) {
+		log.Debugf("Token decimals adjusted: '%d' -> '%d'", token.Decimals, assetInfo.Decimals)
 		token.Decimals = uint(assetInfo.Decimals)
 	}
 
@@ -535,3 +533,28 @@ func addPairToToken(pairToken, token *TokenItem, list *TokenList) {
 
 	list.Tokens[tokenInListIndex].Pairs = append(list.Tokens[tokenInListIndex].Pairs, Pair{Base: pairToken.Asset})
 }
+
+// func addPairToToken(pairToken, token *TokenItem, list *TokenList) {
+// 	var tokenInList *TokenItem
+// 	for _, t := range list.Tokens {
+// 		if t.Address == token.Address {
+// 			tokenInList = &t
+// 		}
+// 	}
+
+// 	if tokenInList == nil {
+// 		return
+// 	}
+
+// 	if len(tokenInList.Pairs) == 0 {
+// 		tokenInList.Pairs = make([]Pair, 0)
+// 	}
+
+// 	for _, pair := range tokenInList.Pairs {
+// 		if pair.Base == pairToken.Asset {
+// 			return
+// 		}
+// 	}
+
+// 	tokenInList.Pairs = append(tokenInList.Pairs, Pair{Base: pairToken.Asset})
+// }
