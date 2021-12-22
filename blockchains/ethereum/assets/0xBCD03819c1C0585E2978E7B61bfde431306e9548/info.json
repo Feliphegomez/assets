@@ -1,0 +1,25 @@
+{
+    "name": "Citrino",
+    "website": "https://pacmec.co/",
+    "description": "CITRINO (CTN) es el motor del Ecosistema PACMEC y la moneda nativa del mismo.",
+    "explorer": "https://bscscan.com/address/0xBCD03819c1C0585E2978E7B61bfde431306e9548",
+    "type": "BEP20",
+    "symbol": "CTN",
+    "decimals": 18,
+    "status": "active",
+    "id": "0xBCD03819c1C0585E2978E7B61bfde431306e9548",
+    "links": [
+        {
+            "name": "github",
+            "url": "https://github.com/PACMEC"
+        },
+        {
+            "name": "twitter",
+            "url": "https://twitter.com/ByPACMEC"
+        },
+        {
+            "name": "facebook",
+            "url": "https://facebook.com/ByPACMEC"
+        }
+    ]
+}
